@@ -1,0 +1,31 @@
+# Python and build outputs
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+# Jupyter and local editors
+.ipynb_checkpoints/
+.vscode/
+.idea/
+# Local data and generated submissions
+/data/*
+!/data/.gitkeep
+/submissions/*
+!/submissions/.gitkeep
+# Secrets, temporary files and OS files
+.env
+.env.*
+*.tmp
+*.temp
+*.log
+*.bak
+~$*
+.DS_Store
+Thumbs.db
+Desktop.ini

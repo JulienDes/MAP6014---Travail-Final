@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "map6014-house-prices"
+version = "0.1.0"
+description = "Travail universitaire MAP6014 : Kaggle House Prices"
+readme = "README.md"
+requires-python = ">=3.14,<3.15"
+dependencies = [
+    "numpy>=2.3.3,<3",
+    "pandas>=2.3.3,<4",
+    "matplotlib>=3.10.7,<4",
+    "seaborn>=0.13.2,<1",
+    "scipy>=1.16.1,<2",
+    "scikit-learn>=1.8,<2",
+    "ipykernel>=7.0.1,<8",
+]
+
+[tool.setuptools]
+packages = ["src"]
