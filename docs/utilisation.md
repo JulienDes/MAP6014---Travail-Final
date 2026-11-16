@@ -2,94 +2,87 @@
 
 [Retour au README](../README.md)
 
-### Prérequis
+## Démarrage rapide — Windows / PowerShell
 
-Windows, PowerShell, Git, VS Code avec les extensions **Python** et **Jupyter**, et CPython **3.14 standard, 64 bits**.
+Il faut **Python 3.14 standard, 64 bits** et **VS Code** avec les extensions **Python** et **Jupyter**. Si Python manque, l'installer depuis [python.org](https://www.python.org/downloads/), puis rouvrir VS Code. La commande `py -3.14 --version` doit afficher `Python 3.14...`.
 
-Python 3.14 est compatible avec les versions récentes retenues, notamment [NumPy 2.3.3](https://numpy.org/doc/stable/release/2.3.3-notes.html), [pandas 2.3.3](https://pandas.pydata.org/pandas-docs/stable/whatsnew/v2.3.3.html), [SciPy 1.16.1](https://discuss.scientific-python.org/t/ann-scipy-1-16-1-release/2033), [scikit-learn](https://github.com/scikit-learn/scikit-learn/releases), [Matplotlib 3.10.7](https://pypi.org/project/matplotlib/3.10.7/) et [ipykernel 7.0.1](https://github.com/ipython/ipykernel/releases). Les bornes évitent certaines anciennes versions incompatibles; elles ne verrouillent pas exactement l'environnement.
+### 1. Créer `.venv` et installer les dépendances
 
-`.python-version` indique 3.14 sans installer ni activer Python. `pyproject.toml` limite le projet à cette version mineure.
+Dans VS Code, ouvrir le dossier du projet, puis **Terminal > Nouveau terminal**. Le terminal doit être à la racine du projet, dans le dossier contenant `pyproject.toml`.
 
-### 1. Vérifier Python et Git
-
-```powershell
-py --list
-py -3.14 --version
-git --version
-```
-
-Si nécessaire, installer Python 3.14 depuis python.org puis rouvrir PowerShell. Si `py` est absent, remplacer `py -3.14` par le chemin complet de l'exécutable Python 3.14 installé.
-
-### 2. Cloner le dépôt privé et ouvrir VS Code
-
-Remplacer l'URL d'exemple par celle du dépôt auquel le collègue a été invité; s'authentifier auprès de GitHub.
-
-```powershell
-git clone https://github.com/VOTRE-ORGANISATION/VOTRE-DEPOT.git house-prices
-cd house-prices
-code .
-```
-
-Si le dépôt est déjà présent, ouvrir directement sa racine. Si `code` est indisponible, utiliser **Fichier > Ouvrir le dossier**. Le nom `house-prices` est indicatif; le dossier actuel peut porter un autre nom.
-
-### 3. Créer et activer `.venv`
-
-Depuis la racine, dans le terminal PowerShell :
+Copier ces trois commandes dans PowerShell :
 
 ```powershell
 py -3.14 -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python --version
+python -m pip install -e .
+```
+
+- La première crée l'environnement dans le dossier `.venv`.
+- La deuxième l'active pour ce terminal : les commandes `python` utilisent alors cet environnement.
+- La troisième installe le code du projet et toutes les dépendances déclarées dans `pyproject.toml`. La première installation peut prendre quelques minutes.
+
+Si PowerShell bloque l'activation, voir [le dépannage](#en-cas-de-problème) plus bas.
+
+Pour vérifier que le bon Python est utilisé :
+
+```powershell
 python -c "import sys; print(sys.executable)"
 ```
 
-Le chemin affiché doit désigner `.venv\Scripts\python.exe`. Si PowerShell bloque l'activation, autoriser les scripts pour cette session :
+Le chemin affiché doit finir par `.venv\Scripts\python.exe`.
+
+### 2. Utiliser les notebooks dans VS Code
+
+1. Faire `Ctrl+Shift+P`, choisir **Python: Select Interpreter**, puis `.venv\Scripts\python.exe`.
+2. Ouvrir un notebook et cliquer sur **Select Kernel** en haut à droite.
+3. Choisir **Python Environments**, puis le Python de `.venv`.
+4. Cliquer sur **Run All** pour exécuter toutes les cellules, ou sur le bouton ▶ d'une cellule pour l'exécuter seule.
+
+`ipykernel`, nécessaire aux notebooks, est déjà installé à l'étape 1. Les indications sur les données et l'ordre des notebooks se trouvent dans la section [Utilisation](#utilisation).
+
+### 3. Lancer un script Python
+
+Dans le terminal avec `.venv` activé, lancer un fichier Python avec :
+
+```powershell
+python chemin\vers\script.py
+```
+
+Remplacer `chemin\vers\script.py` par le chemin du fichier à exécuter, depuis la racine du projet. C'est un exemple pour les futurs scripts : le projet ne contient pas encore de programme principal. Les modules de `src` peuvent être importés dans les notebooks, par exemple avec `from src import preprocessing`.
+
+### 4. Reprendre le travail une autre journée
+
+Ouvrir le dossier du projet dans VS Code, puis activer l'environnement dans le nouveau terminal :
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Pour les notebooks, vérifier que le kernel sélectionné est toujours `.venv`. **Il n'est pas nécessaire de recréer l'environnement ni de réinstaller les dépendances à chaque séance.**
+
+Si les dépendances de `pyproject.toml` changent, relancer `python -m pip install -e .` dans le terminal activé. Pour désactiver l'environnement à la fin d'une séance, taper `deactivate` ou fermer le terminal.
+
+## En cas de problème
+
+### PowerShell bloque l'activation
+
+Autoriser les scripts uniquement pour le terminal en cours, puis réessayer :
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
 .\.venv\Scripts\Activate.ps1
 ```
 
-Cette modification cesse à la fermeture du terminal. Si une politique institutionnelle la bloque, utiliser directement l'exécutable sans activation, par exemple : `& .\.venv\Scripts\python.exe -m pip install -e .`.
+### Le kernel `.venv` n'apparaît pas ou une bibliothèque est introuvable
 
-### 4. Mettre à jour pip et installer
-
-Avec `.venv` activé :
-
-```powershell
-python -m pip install --upgrade pip
-python -m pip install -e .
-python -m pip check
-python -c "import src.preprocessing, src.training, src.evaluation; import pandas, numpy, matplotlib, seaborn, scipy, sklearn, ipykernel; print('Imports OK')"
-```
-
-La distribution s'appelle `map6014-house-prices`; le paquet importé s'appelle `src`. La déclaration explicite `packages = ["src"]` permet l'installation avec l'arborescence demandée. L'installation éditable reflète les modifications sans réinstallation; redémarrer le kernel après modification si nécessaire. Ne pas installer un autre paquet nommé `src` dans cet environnement.
-
-### 5. Sélectionner l'interpréteur et le kernel Jupyter
-
-1. Ouvrir la palette VS Code avec `Ctrl+Shift+P`.
-2. Choisir **Python: Select Interpreter**, puis `.venv\Scripts\python.exe`.
-3. Ouvrir un notebook et cliquer **Select Kernel** en haut à droite.
-4. Choisir **Python Environments**, puis le Python de `.venv`.
-5. Si nécessaire, sélectionner manuellement le chemin de l'interpréteur.
-
-`ipykernel` est inclus dans les dépendances. Un enregistrement global du kernel et un serveur Jupyter séparé ne sont normalement pas nécessaires dans VS Code. Si `.venv` n'apparaît pas, recharger la fenêtre et vérifier l'interpréteur. Le kernel et l'activation du terminal sont deux réglages distincts.
-
-### 6. Désactiver et réactiver
-
-```powershell
-deactivate
-# Dans un nouveau terminal, revenir à la racine, puis :
-.\.venv\Scripts\Activate.ps1
-```
-
-Ne pas recréer `.venv` à chaque séance. Réexécuter `python -m pip install -e .` si les dépendances changent.
+Vérifier que l'installation de l'étape 1 s'est terminée sans erreur. Dans VS Code, faire `Ctrl+Shift+P`, puis **Developer: Reload Window**. Refaire la sélection de l'interpréteur et du kernel décrite à l'étape 2, puis redémarrer le kernel.
 
 ## Utilisation
 
 1. Consulter [Data sur Kaggle](https://www.kaggle.com/competitions/house-prices-advanced-regression-techniques/data), vérifier les règles et télécharger manuellement les fichiers autorisés.
 2. Décompresser directement dans `data/` : `train.csv`, `test.csv`, `sample_submission.csv` et `data_description.txt`.
-3. Ouvrir les trois notebooks dans l'ordre avec le kernel `.venv`. Ils ne contiennent actuellement que des sections Markdown à compléter.
+3. Ouvrir [le choix du problème](../notebooks/01_choix_probleme.ipynb), puis [la présentation du problème](../notebooks/02_presentation_probleme.ipynb) avec le kernel `.venv`. Exécuter les cellules du notebook 02 pour afficher les données et les contrôles. Poursuivre ensuite avec [l'analyse exploratoire](../notebooks/03_analyse_exploratoire.ipynb), dont la trame reste à compléter. Les notebooks de prétraitement et de modélisation existants restent réservés aux étapes suivantes.
 4. Importer ultérieurement les modules avec `from src import preprocessing`, par exemple, sans modifier manuellement `sys.path`.
 5. Construire les chemins avec `pathlib.Path`. Vérifier `Path.cwd()` et repérer explicitement la racine contenant `pyproject.toml`; le kernel peut démarrer à la racine ou dans `notebooks/`.
 6. Après développement, redémarrer le kernel et exécuter toutes les cellules dans l'ordre.
@@ -102,5 +95,5 @@ Ne pas recréer `.venv` à chaque séance. Réexécuter `python -m pip install -
 - Fixer et consigner un `random_state` pour les opérations aléatoires qui le permettent. Cela ne garantit pas une identité numérique entre plateformes.
 - Séparer entraînement et validation avant les transformations apprises et les choix guidés par la cible.
 - Ajuster imputation, encodage, standardisation et sélection dans les futurs pipelines, uniquement sur l'entraînement de chaque pli, sans apprendre de la validation ou de `test.csv`.
-- Consigner chaque expérience : commit, versions, partition, graine, variables, transformations, modèle, paramètres, protocole, métriques et interprétation. Prévoir un tableau dans le troisième notebook ou `docs/`.
+- Consigner chaque expérience : commit, versions, partition, graine, variables, transformations, modèle, paramètres, protocole, métriques et interprétation. Prévoir un tableau dans le notebook de modélisation et d'évaluation ou `docs/`.
 - Préserver les données brutes et documenter provenance et date de téléchargement.
