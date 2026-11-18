@@ -8,11 +8,11 @@ House Prices a été sélectionnée. Vérifier que les données sont libres d'ac
 
 ### Étape 2 — Présentation du problème
 
-Le lien, la problématique et l'objectif figurent dans le [README](../README.md). Compléter dans le premier notebook la description des variables, types, unités et catégories à partir de `data_description.txt`. Présenter les défis : valeurs manquantes, catégories, asymétrie des prix, valeurs atypiques, corrélations et généralisation; les confirmer par l'analyse.
+Le lien, la problématique et l'objectif figurent dans le [README](../README.md). La présentation et le dictionnaire des variables figurent dans [le notebook de l'étape 2](../notebooks/02_presentation_probleme.ipynb), à partir des fichiers locaux et de `data_description.txt`. Présenter les défis : valeurs manquantes, catégories, asymétrie des prix, valeurs atypiques, corrélations et généralisation; les confirmer par l'analyse.
 
 ### Étape 3 — Analyse exploratoire
 
-Dans `notebooks/01_exploration.ipynb` : description des données, statistiques descriptives, identification des valeurs manquantes, distributions, corrélations et visualisations pertinentes. **Chaque figure devra être clairement commentée et interprétée** : observation, signification et conséquence pour la suite. Une corrélation ne démontre pas une causalité.
+Dans [le notebook de l'étape 3](../notebooks/03_analyse_exploratoire.ipynb) : description des données, statistiques descriptives, identification des valeurs manquantes, distributions, corrélations et visualisations pertinentes. **Chaque figure devra être clairement commentée et interprétée** : observation, signification et conséquence pour la suite. Une corrélation ne démontre pas une causalité.
 
 ### Étape 4 — Prétraitement
 
