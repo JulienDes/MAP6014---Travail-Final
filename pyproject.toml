@@ -30,5 +30,5 @@ rag = [
     "ipywidgets>=8.1,<9",  # barres de progression tqdm dans Jupyter (IProgress)
 ]
 
-[tool.setuptools]
-packages = ["src"]
+[tool.setuptools.packages.find]
+include = ["src*"]

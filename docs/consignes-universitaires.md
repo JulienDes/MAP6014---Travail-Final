@@ -16,11 +16,11 @@ Dans [le notebook de l'étape 3](../notebooks/03_analyse_exploratoire.ipynb) : d
 
 ### Étape 4 — Prétraitement
 
-Dans `notebooks/02_pretraitement.ipynb`, décrire et justifier nettoyage, traitement des valeurs manquantes, encodage des catégories, normalisation ou standardisation, sélection et création de caractéristiques (*feature engineering*). Les futures fonctions communes iront dans `src/preprocessing.py`. Prévoir des pipelines scikit-learn : ajuster les transformations apprises sur l'entraînement uniquement, y compris dans chaque pli de validation croisée.
+Dans `notebooks/04_pretraitement.ipynb`, décrire et justifier nettoyage, traitement des valeurs manquantes, encodage des catégories, normalisation ou standardisation, sélection et création de caractéristiques (*feature engineering*). Les futures fonctions communes iront dans `src/preprocessing/`. Prévoir des pipelines scikit-learn : ajuster les transformations apprises sur l'entraînement uniquement, y compris dans chaque pli de validation croisée.
 
 ### Étape 5 — Développement de la solution
 
-Dans `notebooks/03_modelisation_evaluation.ipynb`, identifier le **modèle principal : à choisir ultérieurement**, ses paramètres, hypothèses et justifications techniques. Des comparaisons seront possibles en distinguant clairement le modèle retenu. Les fonctions communes iront dans `src/training.py`. Aucun modèle n'est encore implémenté.
+Dans `notebooks/05_developpement_solution.ipynb`, identifier le **modèle principal : à choisir ultérieurement**, ses paramètres, hypothèses et justifications techniques. Des comparaisons seront possibles en distinguant clairement le modèle retenu. Les fonctions communes iront dans `src/training.py`. Aucun modèle n'est encore implémenté.
 
 ### Étape 6 — Évaluation
 
