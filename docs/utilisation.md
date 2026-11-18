@@ -73,6 +73,16 @@ python -m pip install -e ".[rag]"
 
 Les appels au LLM exigent une clé OpenAI. Créer à la racine un fichier `.env`, ignoré par Git, contenant `OPENAI_API_KEY=...`. Ne jamais écrire la clé dans un notebook. Sans clé, le notebook évalue seulement les méthodes sans LLM. L'index ChromaDB et le cache des réponses sont créés dans `data/`, qui n'est pas versionné.
 
+### 6. Expérience XGBoost (optionnelle)
+
+Le notebook [`notebooks/experiences/03_xgboost.ipynb`](../notebooks/experiences/03_xgboost.ipynb) demande XGBoost :
+
+```powershell
+python -m pip install -e ".[xgboost]"
+```
+
+Il n'utilise aucune clé d'API. Il relit en lecture seule les caches des expériences RAG s'ils existent dans `data/cache_rag/`, pour comparer les résultats, et écrit une soumission dans `submissions/03_xgboost.csv`. La recherche aléatoire des hyperparamètres prend environ 3 minutes; mettre `RUN_SEARCH = False` pour l'ignorer.
+
 ## En cas de problème
 
 ### PowerShell bloque l'activation
