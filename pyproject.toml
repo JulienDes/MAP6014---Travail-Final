@@ -19,6 +19,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+dev = ["pytest"]
 # Expériences RAG filtré (notebooks/experiences/01_rag_filtre.ipynb et 02_rag_filtre_v2.ipynb).
 rag = [
     "chromadb>=1.5,<2",
