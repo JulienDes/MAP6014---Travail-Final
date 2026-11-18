@@ -38,7 +38,6 @@ house-prices/
 │   └── evaluation.py
 ├── submissions/
 ├── docs/
-├── tests/
 ├── .gitignore
 ├── .python-version
 ├── pyproject.toml
@@ -62,7 +61,6 @@ house-prices/
 | `src/evaluation.py` | Calcule les métriques de régression et compare les résultats pour l'étape 6. |
 | `submissions/` | Prédictions générées, ignorées par Git. |
 | `docs/` | Références, présentation, captures et bilans. |
-| `tests/` | Futurs tests des fonctions réutilisables. |
 
 Les fichiers de configuration à la racine définissent les dépendances, la version Python et les exclusions Git. Le README renvoie aux guides détaillés; les `.gitkeep` permettent de conserver les dossiers vides.
 
