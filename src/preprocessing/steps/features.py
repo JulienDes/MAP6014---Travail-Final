@@ -49,7 +49,14 @@ class FeatureCreator(TransformerMixin, BaseEstimator):
         self.groups = groups
 
     def fit(self, X, y=None):
-        """Renvoyer le transformateur : toutes les formules sont fixées à l'avance."""
+        """Renvoyer le transformateur : toutes les formules sont fixées à l'avance.
+
+        Un Pipeline appelle fit sur chaque étape, qui doit renvoyer self
+        (guide des estimateurs, section « Fitting ») :
+        https://scikit-learn.org/stable/developers/develop.html#:~:text=even%20unsupervised%20estimators%20need%20to%20accept
+        Scikit-learn garde aussi un fit inutile dans Normalizer, une étape sans état :
+        https://scikit-learn.org/stable/modules/preprocessing.html#:~:text=the%20class%20is%20stateless
+        """
         return self
 
     def transform(self, X):
