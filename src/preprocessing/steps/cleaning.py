@@ -64,6 +64,14 @@ class Cleaner(TransformerMixin, BaseEstimator):
         return cleaned
 
 
+def unusual_sales(X, y):
+    """Marquer les ventes incohérentes de très grandes maisons à faible prix (524 et 1299).
+
+    Renvoyer un masque booléen indexé comme X. La cible y est en dollars.
+    """
+    return X["GrLivArea"].gt(LARGE_HOUSE_AREA) & y.lt(LOW_LARGE_HOUSE_PRICE)
+
+
 def remove_outliers(X, y):
     """Retirer les ventes incohérentes de très grandes maisons à faible prix.
 
@@ -71,5 +79,5 @@ def remove_outliers(X, y):
     ni à test.csv. La cible y est une série de prix en dollars indexée comme X.
     Renvoyer des copies des caractéristiques et des prix des maisons conservées.
     """
-    unusual = X["GrLivArea"].gt(LARGE_HOUSE_AREA) & y.lt(LOW_LARGE_HOUSE_PRICE)
+    unusual = unusual_sales(X, y)
     return X.loc[~unusual].copy(), y.loc[~unusual].copy()
