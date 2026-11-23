@@ -2,6 +2,8 @@
 
 import numpy as np
 
+from src.preprocessing.steps.cleaning import unusual_sales
+
 
 def rmse_log(y_true, y_pred):
     """Calculer la RMSE Kaggle sur les logarithmes naturels des prix positifs.
@@ -11,6 +13,18 @@ def rmse_log(y_true, y_pred):
     """
     errors = np.log(np.asarray(y_pred)) - np.log(np.asarray(y_true))
     return np.sqrt(np.mean(errors ** 2))
+
+
+def cv_rmse(y_true, y_pred, X):
+    """Calculer la RMSE log des prédictions hors pli sur les ventes typiques.
+
+    Les ventes aberrantes (unusual_sales) sont retirées de l'entraînement de chaque
+    pli; un modèle linéaire leur prédit alors un prix plusieurs fois trop élevé, et
+    leurs deux carrés d'erreur domineraient la comparaison. y_true est en dollars,
+    y_pred dans le même ordre que X et y_true.
+    """
+    typical = ~unusual_sales(X, y_true).to_numpy()
+    return rmse_log(np.asarray(y_true)[typical], np.asarray(y_pred)[typical])
 
 
 def regression_metrics(y_true, y_pred):

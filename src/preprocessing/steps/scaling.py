@@ -23,11 +23,10 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from src.preprocessing.steps.encoding import ORDINAL_COLUMNS
 
-# Au-delà, la distribution a une longue queue à droite. Le seuil usuel 0,75 est
-# trop proche de l'asymétrie des surfaces du sous-sol une fois les deux ventes
-# aberrantes retirées (TotalBsmtSF ≈ 0,51) : leur log changeait d'un pli à
-# l'autre. 0,5 les garde au log et réduit l'erreur (notebook, section 6.3).
-SKEW_THRESHOLD = 0.5
+# Au-delà, la distribution a une longue queue à droite. Seuil usuel 0,75, confirmé
+# sur les ventes typiques (notebook, section 6.3). Le seuil 0,5 ne semblait meilleur
+# que lorsque la vente 1299 (6 110 pi² de sous-sol) comptait dans l'évaluation.
+SKEW_THRESHOLD = 0.75
 # À partir de la moitié de zéros, l'asymétrie vient de la masse de zéros, pas
 # d'une longue queue. Le log réduirait la variable à « présent ou absent » et
 # effacerait les différences de taille (2ndFlrSF : 0 → 0, 316 → 5,76,
