@@ -63,6 +63,30 @@ Pour les notebooks, vérifier que le kernel sélectionné est toujours `.venv`. 
 
 Si les dépendances de `pyproject.toml` changent, relancer `python -m pip install -e .` dans le terminal activé. Pour désactiver l'environnement à la fin d'une séance, taper `deactivate` ou fermer le terminal.
 
+### 5. Expériences RAG filtré (optionnelles)
+
+Les notebooks [`notebooks/experiences/01_rag_filtre.ipynb`](../notebooks/experiences/01_rag_filtre.ipynb) et [`02_rag_filtre_v2.ipynb`](../notebooks/experiences/02_rag_filtre_v2.ipynb) demandent des dépendances supplémentaires (ChromaDB, sentence-transformers, PyTorch, le SDK OpenAI et ipywidgets). Leur installation est plus longue et volumineuse :
+
+```powershell
+python -m pip install -e ".[rag]"
+```
+
+Les appels au LLM exigent une clé OpenAI. Créer à la racine un fichier `.env`, ignoré par Git, contenant `OPENAI_API_KEY=...`. Ne jamais écrire la clé dans un notebook. Sans clé, le notebook évalue seulement les méthodes sans LLM. L'index ChromaDB et le cache des réponses sont créés dans `data/`, qui n'est pas versionné.
+
+### 6. Expérience XGBoost (optionnelle)
+
+Le notebook [`notebooks/experiences/03_xgboost.ipynb`](../notebooks/experiences/03_xgboost.ipynb) demande XGBoost :
+
+```powershell
+python -m pip install -e ".[xgboost]"
+```
+
+Il n'utilise aucune clé d'API. Il relit en lecture seule les caches des expériences RAG s'ils existent dans `data/cache_rag/`, pour comparer les résultats, et écrit une soumission dans `submissions/03_xgboost.csv`. La recherche aléatoire des hyperparamètres prend environ 3 minutes; mettre `RUN_SEARCH = False` pour l'ignorer.
+
+### 7. Expérience d'ensemble (optionnelle)
+
+Le notebook [`notebooks/experiences/04_ensemble.ipynb`](../notebooks/experiences/04_ensemble.ipynb) compare cinq modèles (Lasso, ElasticNet, Kernel Ridge, Gradient Boosting, XGBoost) et les combine. Il demande la même dépendance que l'expérience XGBoost (`python -m pip install -e ".[xgboost]"`). L'exécution complète prend environ 3 minutes et écrit une soumission dans `submissions/04_ensemble.csv`.
+
 ## En cas de problème
 
 ### PowerShell bloque l'activation
