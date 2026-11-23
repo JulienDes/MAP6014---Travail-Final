@@ -83,6 +83,10 @@ python -m pip install -e ".[xgboost]"
 
 Il n'utilise aucune clé d'API. Il relit en lecture seule les caches des expériences RAG s'ils existent dans `data/cache_rag/`, pour comparer les résultats, et écrit une soumission dans `submissions/03_xgboost.csv`. La recherche aléatoire des hyperparamètres prend environ 3 minutes; mettre `RUN_SEARCH = False` pour l'ignorer.
 
+### 7. Expérience d'ensemble (optionnelle)
+
+Le notebook [`notebooks/experiences/04_ensemble.ipynb`](../notebooks/experiences/04_ensemble.ipynb) compare cinq modèles (Lasso, ElasticNet, Kernel Ridge, Gradient Boosting, XGBoost) et les combine. Il demande la même dépendance que l'expérience XGBoost (`python -m pip install -e ".[xgboost]"`). L'exécution complète prend environ 3 minutes et écrit une soumission dans `submissions/04_ensemble.csv`.
+
 ## En cas de problème
 
 ### PowerShell bloque l'activation
