@@ -13,16 +13,31 @@ house-prices/
 │   ├── 01_choix_probleme.ipynb
 │   ├── 02_presentation_probleme.ipynb
 │   ├── 03_analyse_exploratoire.ipynb
+│   ├── 04_pretraitement.ipynb
+│   ├── 05_developpement_solution.ipynb
 │   ├── 06_evaluation.ipynb
 │   └── 07_analyse_critique.ipynb
 ├── src/
 │   ├── __init__.py
 │   ├── preprocessing/
+│   │   ├── __init__.py
+│   │   ├── pipelines.py
+│   │   ├── steps/
+│   │   │   ├── __init__.py
+│   │   │   ├── cleaning.py
+│   │   │   ├── missing.py
+│   │   │   ├── features.py
+│   │   │   ├── encoding.py
+│   │   │   └── scaling.py
+│   │   └── strategies/
+│   │       ├── __init__.py
+│   │       ├── correlation.py
+│   │       ├── causal.py
+│   │       └── pca.py
 │   ├── training.py
 │   └── evaluation.py
 ├── submissions/
 ├── docs/
-├── tests/
 ├── .gitignore
 ├── .python-version
 ├── pyproject.toml
@@ -33,13 +48,20 @@ house-prices/
 |---|---|
 | `data/` | Fichiers Kaggle locaux, ignorés par Git; données brutes à garder intactes. |
 | `notebooks/` | Présentation et analyses, avec une numérotation correspondant aux étapes universitaires. |
-| `src/preprocessing/` | Étape 4 : plusieurs modules de prétraitement, de sélection ou de transformation des variables, selon les besoins. |
-| `src/training.py` | Étape 5 : entraînement et comparaison de différents modèles. |
-| `src/evaluation.py` | Étape 6 : métriques et prédictions; résultats présentés dans le notebook 06. |
+| `src/preprocessing/pipelines.py` | Assemble cinq recettes pour l'étape 4 (base, corrélation, causale, ACP, causale avec ACP par blocs). |
+| `steps/cleaning.py` | Harmonise les codes et traite les incohérences. Permet d'exclure les ventes atypiques de l'entraînement. |
+| `steps/missing.py` | Distingue les absences d'équipement des valeurs inconnues à imputer. |
+| `steps/features.py` | Crée les caractéristiques dérivées, dont l'âge à la vente. |
+| `steps/encoding.py` | Encode les qualités ordinales et les catégories nominales. |
+| `steps/scaling.py` | Corrige l'asymétrie par `log1p` et standardise les caractéristiques. |
+| `strategies/correlation.py` | Sélectionne des variables selon leur corrélation avec le prix. |
+| `strategies/causal.py` | Sélectionne des variables selon les hypothèses causales retenues. |
+| `strategies/pca.py` | Réduit la dimension par ACP globale ou par blocs de variables. |
+| `src/training.py` | Charge les données, construit le modèle et évalue le pipeline sur une partition réservée ou par validation croisée (étape 5). |
+| `src/evaluation.py` | Calcule les métriques de régression et compare les résultats pour l'étape 6. |
 | `submissions/` | Prédictions générées, ignorées par Git. |
 | `docs/` | Références, présentation, captures et bilans. |
-| `tests/` | Futurs tests des fonctions réutilisables. |
 
 Les fichiers de configuration à la racine définissent les dépendances, la version Python et les exclusions Git. Le README renvoie aux guides détaillés; les `.gitkeep` permettent de conserver les dossiers vides.
 
-Le découpage des prétraitements reste libre : ajouter, regrouper ou retirer des modules selon les approches réellement explorées, sans imposer un fichier pour chaque méthode envisagée.
+Les dossiers `steps/` et `strategies/` se trouvent dans `src/preprocessing/`. Chaque recette sera ajustée uniquement sur les maisons d'entraînement de la partition ou du pli en cours.
