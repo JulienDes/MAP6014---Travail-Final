@@ -57,7 +57,7 @@ house-prices/
 | `strategies/correlation.py` | Sélectionne des variables selon leur corrélation avec le prix. |
 | `strategies/causal.py` | Sélectionne des variables selon les hypothèses causales retenues. |
 | `strategies/pca.py` | Réduit la dimension par ACP globale ou par blocs de variables. |
-| `src/training.py` | Charge les données, construit le modèle et évalue le pipeline sur une partition réservée ou par validation croisée (étape 5). |
+| `src/training.py` | Charge les données, construit le modèle et évalue le pipeline par validation croisée (étape 5). |
 | `src/evaluation.py` | Calcule les métriques de régression et compare les résultats pour l'étape 6. |
 | `submissions/` | Prédictions générées, ignorées par Git. |
 | `docs/` | Références, présentation, captures et bilans. |
