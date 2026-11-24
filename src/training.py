@@ -15,7 +15,6 @@ from sklearn.ensemble import GradientBoostingRegressor, VotingRegressor
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.linear_model import ElasticNetCV, LassoCV
-from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from xgboost import XGBRegressor
 
@@ -24,7 +23,6 @@ from src.preprocessing.pipelines import make_base
 from src.preprocessing.steps.cleaning import remove_outliers
 
 RANDOM_STATE = 42
-VALIDATION_SIZE = 0.2
 
 # LassoCV et ElasticNetCV essaient de très faibles pénalités, lentes à converger et
 # jamais retenues : leurs avertissements sont masqués.
@@ -89,19 +87,6 @@ def member_predictions(model, X):
     return pd.DataFrame({name: np.exp(estimator.predict(transformed))
                          for name, estimator in zip(voting.named_estimators_, voting.estimators_)},
                         index=X.index)
-
-
-def holdout_evaluate(pipeline, X, y, test_size=VALIDATION_SIZE, random_state=RANDOM_STATE):
-    """Ajuster le pipeline sur l'entraînement puis l'évaluer sur une partition réservée.
-
-    Renvoyer le modèle ajusté, les prix prédits pour la partition réservée et leur
-    RMSE log sur les ventes typiques.
-    """
-    train_index, valid_index = train_test_split(X.index, test_size=test_size,
-                                                random_state=random_state)
-    model = fit_model(clone(pipeline), X.loc[train_index], y.loc[train_index])
-    predictions = pd.Series(model.predict(X.loc[valid_index]), index=valid_index)
-    return model, predictions, cv_rmse(y.loc[valid_index], predictions, X.loc[valid_index])
 
 
 def cross_validate_model(pipeline, X, y, cv):

@@ -19,7 +19,7 @@ PLACEHOLDER_AREA = 1
 MASONRY_TYPES = {"BrkFace", "BrkCmn", "Stone"}
 # De Cock (2011) signale les surfaces habitables dépassant cette limite.
 LARGE_HOUSE_AREA = 4_000
-# Sous ce prix, les très grandes maisons se détachent de la tendance (étape 3, § 7.1).
+# Sous ce prix, les très grandes maisons se détachent de la tendance (notebook 03, section 6).
 LOW_LARGE_HOUSE_PRICE = 300_000
 
 
@@ -41,9 +41,10 @@ class Cleaner(TransformerMixin, BaseEstimator):
         """Renvoyer un DataFrame nettoyé en conservant les lignes et leur index.
 
         Id identifie une vente et est retiré.
-        MSSubClass devient un code textuel de type de logement.
-        Exterior2nd reprend les codes de matériaux de Exterior1st.
+        MSSubClass est convertie en texte pour être traitée comme une variable catégorielle.
+        Exterior2nd corrige trois codes pour les écrire comme dans Exterior1st.
         Utilities est écartée car sa seule exception connue est dans train.
+        YearRemodAdd reprend YearBuilt si la rénovation précède la construction.
         GarageYrBlt reprend YearRemodAdd si la date dépasse la tolérance après vente.
         MasVnrType et MasVnrArea sont réconciliés selon la présence et la surface.
         """
@@ -51,6 +52,10 @@ class Cleaner(TransformerMixin, BaseEstimator):
         cleaned["MSSubClass"] = cleaned["MSSubClass"].astype("string")
         cleaned["Exterior2nd"] = cleaned["Exterior2nd"].replace(EXTERIOR_CODES)
         cleaned = cleaned.drop(columns="Utilities")
+
+        # Sans rénovation, le dictionnaire donne YearRemodAdd = YearBuilt.
+        early = cleaned["YearRemodAdd"] < cleaned["YearBuilt"]
+        cleaned.loc[early, "YearRemodAdd"] = cleaned.loc[early, "YearBuilt"]
 
         future = cleaned["GarageYrBlt"] > cleaned["YrSold"] + GARAGE_YEAR_TOLERANCE
         cleaned.loc[future, "GarageYrBlt"] = cleaned.loc[future, "YearRemodAdd"]
@@ -73,11 +78,6 @@ def unusual_sales(X, y):
 
 
 def remove_outliers(X, y):
-    """Retirer les ventes incohérentes de très grandes maisons à faible prix.
-
-    Appliquer uniquement à l'entraînement de chaque pli, jamais à la validation
-    ni à test.csv. La cible y est une série de prix en dollars indexée comme X.
-    Renvoyer des copies des caractéristiques et des prix des maisons conservées.
-    """
+    """Retirer les ventes incohérentes de très grandes maisons à faible prix."""
     unusual = unusual_sales(X, y)
     return X.loc[~unusual].copy(), y.loc[~unusual].copy()
