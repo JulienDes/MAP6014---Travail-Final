@@ -58,6 +58,44 @@ def consistency_report(X, groups=EQUIPMENT_GROUPS):
     return pd.DataFrame.from_dict(rows, orient="index").astype("Int64")
 
 
+CASE_NAMES = {"R1": "Équipement absent", "R2": "Description manquante", "R3": "Mesure manquante"}
+
+
+def imputation_report(before, after, groups=EQUIPMENT_GROUPS):
+    """Lister chaque champ d'équipement rempli par transform, avec le cas de sa maison.
+
+    before est le tableau avant transform, after le résultat; leurs index sont identiques.
+    Chaque ligne garde l'index de la maison et donne Cas, Groupe, Champ, Avant et Après.
+    """
+    parts = []
+    for name, group in groups.items():
+        cases = _equipment_cases(before, group)[list(CASE_NAMES)]
+        for column in [group["measure"], *group["descriptors"], *group["numbers"]]:
+            filled = before[column].isna() & after[column].notna()
+            if column in group["descriptors"]:
+                filled |= before[column].eq(ABSENT_LABEL) & after[column].ne(ABSENT_LABEL)
+            if not filled.any():
+                continue
+            if not cases[filled].sum(axis=1).eq(1).all():
+                raise ValueError(f"{column} : champ rempli hors des trois cas.")
+            parts.append(pd.DataFrame({
+                "Cas": cases[filled].idxmax(axis=1).map(CASE_NAMES),
+                "Groupe": name, "Champ": column,
+                "Avant": before.loc[filled, column].astype(object),
+                "Après": after.loc[filled, column].astype(object),
+            }))
+    for column in NO_MEASURE_ABSENCE:
+        if column in before:
+            filled = before[column].isna() & after[column].notna()
+            parts.append(pd.DataFrame({
+                "Cas": CASE_NAMES["R1"], "Groupe": column, "Champ": column,
+                "Avant": before.loc[filled, column].astype(object),
+                "Après": after.loc[filled, column].astype(object),
+            }))
+    columns = ["Cas", "Groupe", "Champ", "Avant", "Après"]
+    return pd.concat(parts) if parts else pd.DataFrame(columns=columns)
+
+
 def _column_stat(series):
     """Calculer la médiane ou le premier mode disponible sur l'échantillon fourni."""
     known = series.dropna()
@@ -99,7 +137,17 @@ class MissingValueHandler(TransformerMixin, BaseEstimator):
         return self
 
     def transform(self, X):
-        """Imputer une copie et signaler les colonnes qui restent sans valeur de repli."""
+        """Imputer une copie et signaler les colonnes qui restent sans valeur de repli.
+
+        Équipement absent (mesure nulle ou manquante, descriptions vides) : descriptions à None, quantités à 0.
+        Mesure manquante (description renseignée) : médiane de la mesure chez les maisons équipées de train.
+        Description manquante (mesure positive) : mode ou médiane chez les maisons équipées de train.
+        Alley et Fence passent à None, car le dictionnaire code ainsi leur absence.
+        GarageYrBlt reprend YearBuilt, vaut 0 ou est retirée selon garage_year_fill.
+        LotFrontage reprend la médiane du quartier si lot_frontage_fill vaut "neighborhood".
+        Functional vaut Typ, la valeur que le dictionnaire suppose par défaut.
+        Repli global : médiane ou mode de train pour toute valeur encore absente.
+        """
         check_is_fitted(self, "column_fill_")
         result = X.copy()
         for group in self.groups.values():

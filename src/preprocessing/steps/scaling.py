@@ -24,7 +24,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from src.preprocessing.steps.encoding import ORDINAL_COLUMNS
 
 # Au-delà, la distribution a une longue queue à droite. Seuil usuel 0,75, confirmé
-# sur les ventes typiques (notebook, section 6.3). Le seuil 0,5 ne semblait meilleur
+# sur les ventes typiques. Le seuil 0,5 ne semblait meilleur
 # que lorsque la vente 1299 (6 110 pi² de sous-sol) comptait dans l'évaluation.
 SKEW_THRESHOLD = 0.75
 # À partir de la moitié de zéros, l'asymétrie vient de la masse de zéros, pas
@@ -53,7 +53,11 @@ class SkewCorrector(TransformerMixin, BaseEstimator):
         self.exclude = exclude
 
     def fit(self, X, y=None):
-        """Choisir les colonnes à passer au log et documenter chaque décision."""
+        """Choisir les colonnes à passer au log et documenter chaque décision.
+
+        log1p pour une colonne dont l'asymétrie dépasse threshold (0,75) et dont moins de max_zero_share (50 %) des valeurs valent 0.
+        Exclues d'office : années, mois, scores, KitchenAbvGr, échelles ordinales (exclude) et indicateurs 0/1.
+        """
         rows = []
         for column in X.select_dtypes(include="number").columns:
             values = X[column]
@@ -89,11 +93,6 @@ class SkewCorrector(TransformerMixin, BaseEstimator):
 
 def make_scaler(kind="standard"):
     """Construire la mise à l'échelle des colonnes numériques.
-
-    "standard" donne StandardScaler (notre choix); "minmax" et "none" servent
-    seulement à la comparaison du notebook. Les paramètres (moyennes et écarts
-    types, ou minimums et maximums) sont appris dans fit, donc sur
-    l'entraînement seulement.
     """
     scalers = {"standard": StandardScaler(), "minmax": MinMaxScaler(), "none": "passthrough"}
     return scalers[kind]

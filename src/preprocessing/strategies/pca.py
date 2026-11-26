@@ -26,10 +26,10 @@ from sklearn.decomposition import PCA
 PCA_VARIANCE = 0.99
 
 # Après la sélection causale, ces colonnes décrivent un même équipement (présence,
-# taille, qualité) et ont encore un Spearman d'au moins 0,8 (notebook, section 7.4).
+# taille, qualité) et ont encore un Spearman d'au moins 0,8 .
 # Deux paires aussi corrélées restent séparées : OverallQual et QualxArea, car
 # l'interaction perdrait son rôle, et TotalBsmtSF et 1stFlrSF, deux étages dont le
-# pi² n'a pas la même valeur (section 4.3).
+# pi² n'a pas forcément la même valeur.
 BLOCKS = {
     "Pool": ["PoolArea", "PoolQC", "HasPool"],
     "Misc": ["MiscVal", "HasMiscFeature"],

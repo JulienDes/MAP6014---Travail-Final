@@ -26,7 +26,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
 # Mode retenu : la validation croisée préfère les parties (notebook, section 7.2),
-# car un pi² de sous-sol, de rez-de-chaussée et d'étage n'a pas la même valeur (section 4.3).
+# car un pi² de sous-sol, de rez-de-chaussée et d'étage n'a pas forcément la même valeur.
 CAUSAL_MODE = "parts"
 
 # Règles 1 et 2, valables dans les deux modes.

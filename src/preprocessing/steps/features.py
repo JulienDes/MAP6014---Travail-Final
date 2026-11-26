@@ -60,7 +60,17 @@ class FeatureCreator(TransformerMixin, BaseEstimator):
         return self
 
     def transform(self, X):
-        """Renvoyer une copie de X enrichie des sommes, âges, indicateurs et interaction."""
+        """Renvoyer une copie de X enrichie des sommes, âges, indicateurs et interaction.
+
+        TotalSF additionne TotalBsmtSF, 1stFlrSF et 2ndFlrSF.
+        TotalBath additionne FullBath et BsmtFullBath, plus 0,5 × HalfBath et 0,5 × BsmtHalfBath.
+        TotalPorchSF additionne WoodDeckSF, OpenPorchSF, EnclosedPorch, 3SsnPorch et ScreenPorch.
+        AgeAtSale vaut YrSold − YearBuilt, ramené à 0 s'il est négatif.
+        YearsSinceRemodel vaut YrSold − YearRemodAdd, ramené à 0 s'il est négatif.
+        Indicateurs Has… : 1 si la mesure de l'équipement (ou 2ndFlrSF) est positive, sinon 0.
+        IsNewHouse vaut 1 si YrSold ≤ YearBuilt + 1, sinon 0.
+        QualxArea vaut OverallQual × GrLivArea.
+        """
         # Ajouter un équipement à EQUIPMENT_GROUPS crée son indicateur sans autre code.
         indicators = {f"Has{name}": group["measure"] for name, group in self.groups.items()}
         indicators.update(EXTRA_INDICATORS)
