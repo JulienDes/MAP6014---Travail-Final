@@ -1,8 +1,8 @@
 """Développement de la solution (étape 5). L'asymétrie de SalePrice motive la modélisation du logarithme du prix.
 
-Modèle retenu : la moyenne simple de cinq modèles de familles différentes, entraînés
-sur la recette de prétraitement de l'étape 4 (make_base). La moyenne porte sur les
-logarithmes des prix, l'échelle de la métrique Kaggle.
+Modèle retenu : la moyenne simple de cinq modèles de familles différentes, sur les
+logarithmes des prix, l'échelle de la métrique Kaggle. Chaque membre a son propre
+pipeline, avec le prétraitement de l'étape 4 adapté à sa famille (make_preprocessing).
 """
 
 import warnings
@@ -46,6 +46,9 @@ MEMBERS = {
         tree_method="hist"),
 }
 
+# Les arbres n'ont besoin ni du log ni de la mise à l'échelle (étape 4, section 8.1).
+TREE_MEMBERS = {"Gradient Boosting", "XGBoost"}
+
 
 def load_data(train_path, test_path):
     """Lire les CSV avec na_values=["NA"] et keep_default_na=False pour préserver la catégorie « None ».
@@ -58,19 +61,25 @@ def load_data(train_path, test_path):
     return train.drop(columns="SalePrice"), train["SalePrice"], test
 
 
+def make_preprocessing(name):
+    """Prétraitement de l'étape 4 adapté à la famille du modèle name."""
+    return make_base(log=False, scaler="none") if name in TREE_MEMBERS else make_base()
+
+
 def make_model(members=None):
     """Construire le modèle de régression du prix.
 
-    Prétraitement de l'étape 4, puis moyenne simple des membres (VotingRegressor).
+    Chaque membre devient un pipeline : make_preprocessing(name), puis le modèle.
+    Avec plusieurs membres, VotingRegressor fait la moyenne simple de ces pipelines.
     Le modèle apprend log(SalePrice) et prédit en dollars : la moyenne des
     logarithmes est une moyenne géométrique des prix. members (liste de noms de
     MEMBERS) permet d'entraîner un seul membre ou un sous-ensemble.
     """
     names = list(MEMBERS) if members is None else list(members)
-    estimators = [(name, clone(MEMBERS[name])) for name in names]
-    regressor = estimators[0][1] if len(names) == 1 else VotingRegressor(estimators)
-    return TransformedTargetRegressor(make_pipeline(make_base(), regressor),
-                                      func=np.log, inverse_func=np.exp)
+    pipelines = [(name, make_pipeline(make_preprocessing(name), clone(MEMBERS[name])))
+                 for name in names]
+    regressor = pipelines[0][1] if len(names) == 1 else VotingRegressor(pipelines)
+    return TransformedTargetRegressor(regressor, func=np.log, inverse_func=np.exp)
 
 
 def fit_model(model, X, y):
@@ -80,27 +89,28 @@ def fit_model(model, X, y):
 
 
 def member_predictions(model, X):
-    """Prix prédits par chaque membre d'un ensemble ajusté, une colonne par modèle."""
-    pipeline = model.regressor_
-    transformed = pipeline[:-1].transform(X)
-    voting = pipeline[-1]
-    return pd.DataFrame({name: np.exp(estimator.predict(transformed))
-                         for name, estimator in zip(voting.named_estimators_, voting.estimators_)},
+    """Prix prédits par chaque membre d'un ensemble ajusté, une colonne par modèle.
+
+    Chaque pipeline membre prétraite X lui-même.
+    """
+    voting = model.regressor_
+    return pd.DataFrame({name: np.exp(pipeline.predict(X))
+                         for name, pipeline in zip(voting.named_estimators_, voting.estimators_)},
                         index=X.index)
 
 
 def cross_validate_model(pipeline, X, y, cv):
-    """Évaluer le pipeline en le réajustant sur l'entraînement de chaque pli.
+    """Évaluer le modèle en le réajustant sur l'entraînement de chaque pli.
 
-    Renvoyer les prix prédits hors pli (une colonne par membre et une pour
-    l'ensemble) et la RMSE log de chaque pli sur les ventes typiques.
+    Renvoyer les prix prédits hors pli (une colonne par membre, pour un ensemble,
+    et une pour l'ensemble) et la RMSE log de chaque pli sur les ventes typiques.
     """
     columns = []
     scores = []
     for fit_index, valid_index in cv.split(X):
         model = fit_model(clone(pipeline), X.iloc[fit_index], y.iloc[fit_index])
         valid = X.iloc[valid_index]
-        fold = (member_predictions(model, valid) if hasattr(model.regressor_[-1], "estimators_")
+        fold = (member_predictions(model, valid) if isinstance(model.regressor_, VotingRegressor)
                 else pd.DataFrame(index=valid.index))
         fold["Ensemble"] = model.predict(valid)
         columns.append(fold)
