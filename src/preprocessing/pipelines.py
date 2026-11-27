@@ -33,20 +33,20 @@ def _prepare(*selection):
     return [Cleaner(), MissingValueHandler(), FeatureCreator(), QualityOrdinalEncoder(), *selection]
 
 
-def _encode_and_scale(*numeric_reduction):
+def _encode_and_scale(*numeric_reduction, log=True, scaler="standard"):
     """log1p des longues queues, standardisation des colonnes numériques et one-hot des nominales."""
     columns = ColumnTransformer(
-        [("numeric", make_pipeline(make_scaler(), *numeric_reduction),
+        [("numeric", make_pipeline(make_scaler(scaler), *numeric_reduction),
           make_column_selector(dtype_include="number")),
          ("nominal", make_onehot_encoder(), nominal_columns)],
         verbose_feature_names_out=False,
     )
-    return [SkewCorrector(), columns.set_output(transform="pandas")]
+    return [*([SkewCorrector()] if log else []), columns.set_output(transform="pandas")]
 
 
-def make_base():
+def make_base(log=True, scaler="standard"):
     """Construire le pipeline avec les cinq étapes communes."""
-    return make_pipeline(*_prepare(), *_encode_and_scale())
+    return make_pipeline(*_prepare(), *_encode_and_scale(log=log, scaler=scaler))
 
 
 def make_correlation(min_target_corr=MIN_TARGET_CORRELATION, max_pair_corr=MAX_PAIR_CORRELATION):

@@ -24,6 +24,7 @@ colonne par équipement. Le one-hot part d'une variable TEXTE et donne une
 colonne par catégorie.
 """
 
+import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import OneHotEncoder
 
@@ -85,6 +86,24 @@ class QualityOrdinalEncoder(TransformerMixin, BaseEstimator):
                 raise ValueError(f"Valeurs hors échelle dans {column} : {', '.join(map(str, unknown))}")
             result[column] = result[column].map(scale).astype(int)
         return result
+
+
+def encoding_summary(X, scales=ORDINAL_COLUMNS):
+    """Compter les variables texte de X selon leur encodage.
+
+    Les échelles de scales reçoivent l'encodage ordinal (QualityOrdinalEncoder),
+    toutes les autres variables texte le one-hot (make_onehot_encoder).
+    """
+    text = X.select_dtypes(exclude="number").columns
+    groups = {
+        "Échelle de qualité": [column for column in text if column in QUALITY_COLUMNS],
+        "Autre échelle ordonnée": [column for column in text
+                                   if column in scales and column not in QUALITY_COLUMNS],
+        "Nominale": [column for column in text if column not in scales],
+    }
+    return pd.DataFrame({"Encodage": ["Ordinal", "Ordinal", "One-hot"],
+                         "Variables": [len(columns) for columns in groups.values()]},
+                        index=pd.Index(list(groups), name="Groupe"))
 
 
 def nominal_columns(X):
