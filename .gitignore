@@ -16,8 +16,6 @@ htmlcov/
 # Local data and generated submissions
 /data/*
 !/data/.gitkeep
-/submissions/*
-!/submissions/.gitkeep
 # Secrets, temporary files and OS files
 .env
 .env.*
